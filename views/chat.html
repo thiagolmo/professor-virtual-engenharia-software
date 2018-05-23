@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Professor Virtual - Engenharia de Software</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/dashboard.css" rel="stylesheet">
+
+  </head>
+
+    <body>
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+      <h5 class="my-0 mr-md-auto font-weight-normal">Professor Virtual</h5>
+      <nav class="my-2 my-md-0 mr-md-3">
+        <a class="p-2 text-dark" href="#">Chat</a>
+        <a class="p-2 text-dark" href="#">Meus Dados </a>
+        <a class="p-2 text-dark" href="#">Registro</a>
+      </nav>
+      <a class="btn btn-outline-primary" href="#">Log off</a>
+    </div>
+
+    <main role="main" class="container">
+
+
+
+
+
+<head>
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script>
+
+        var nome;
+        var context;
+
+        $(document).ready(function () {
+            $(window).keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    if ($('#inputChat').val() !== '')
+                        $("#btnChat").click();
+                    return false;
+                }
+            });
+            $("#formChat").hide();
+            $("#btnNome").click(function () {
+                $("#formNome").hide();
+                $("#formChat").show();
+                nome = $('#inputNome').val();
+                context = { nome: nome }
+                sendMessage('');
+            });
+            $("#btnChat").click(function () {
+                $('#logChat').append('<p> <strong class="d-block text-gray-dark">' + nome + ':</strong> ' + $('#inputChat').val());
+		var objDiv = document.getElementById("scroll");
+		objDiv.scrollTop = objDiv.scrollHeight;
+                sendMessage($('#inputChat').val());
+            });
+            function sendMessage(mensagem){
+                $.post('/chat/mensagem',
+                    {
+                        mensagem: mensagem,
+                        context: JSON.stringify(context)
+                    },
+                    function (data) {
+                        context = data.context;
+                        $('#logChat').append('<div class="media text-muted pt-3"><img src="https://marketplace.canva.com/MACHG5SxDWs/1/thumbnail_large/canva-man-with-glasses-icon-MACHG5SxDWs.png" height="40px" width="40px"><p> <strong class="d-block text-gray-dark">Professor Alex: </strong>' + data.resposta + '</div>');
+			var objDiv = document.getElementById("scroll");
+			objDiv.scrollTop = objDiv.scrollHeight;
+                    }
+                );
+                $('#inputChat').val('');
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <form id="formNome">
+        Seu nome é:
+        <input type="text" id="inputNome" value="George">
+        <button type="button" id="btnNome">Confirmar</button>
+    </form>
+    <form id="formChat">
+        <p id="tituloChat">
+            <p>
+                <h2>Chat</h2>
+                <div class='scroll' id="scroll">
+                  <div class="my-3 p-3 bg-white rounded box-shadow" >
+                     <div id="logChat"  ></div>
+                  </div>
+                </div>
+              </br>
+              <div class="row">
+                <div class="col-4">
+                  <input type="text" class="form-control" id="inputChat">
+                </div>
+                <div class="col-2">
+                  <button type="button" class="btn btn-primary btn-block" id="btnChat">Enviar</button>
+                </div>
+              </div>
+
+
+
+
+
+
+
+    </form>
+
+</body>
+
+</html>

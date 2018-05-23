@@ -1,0 +1,25 @@
+{
+  "name": "professor-virtual-conversation",
+  "version": "0.0.1",
+  "description": "Professor virtual para responder dúvidas sobre engenharia de software",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "watson",
+    "conversation",
+    "robo",
+    "nodejs",
+    "expressjs"
+  ],
+  "author": "Thiago Oliveira",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "vcap": "^0.1.0",
+    "watson-developer-cloud": "^2.32.1"
+  }
+}

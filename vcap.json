@@ -1,0 +1,11 @@
+{
+    "conversation": [
+        {
+            "credentials": {
+                "url": "https://gateway.watsonplatform.net/assistant/api",
+                "username": "50f7f801-c47e-476b-8e12-913f24ac65de",
+                "password": "M7aa6QeRpV7Q"
+            }
+        }
+    ]
+}
