@@ -28,9 +28,6 @@
     <main role="main" class="container">
 
 
-
-
-
 <head>
     <script src="/js/jquery-3.2.1.min.js"></script>
     <script>
@@ -57,8 +54,8 @@
             });
             $("#btnChat").click(function () {
                 $('#logChat').append('<p> <strong class="d-block text-gray-dark">' + nome + ':</strong> ' + $('#inputChat').val());
-		var objDiv = document.getElementById("scroll");
-		objDiv.scrollTop = objDiv.scrollHeight;
+            		var objDiv = document.getElementById("scroll");
+            		objDiv.scrollTop = objDiv.scrollHeight;
                 sendMessage($('#inputChat').val());
             });
             function sendMessage(mensagem){
@@ -70,8 +67,8 @@
                     function (data) {
                         context = data.context;
                         $('#logChat').append('<div class="media text-muted pt-3"><img src="https://marketplace.canva.com/MACHG5SxDWs/1/thumbnail_large/canva-man-with-glasses-icon-MACHG5SxDWs.png" height="40px" width="40px"><p> <strong class="d-block text-gray-dark">Professor Alex: </strong>' + data.resposta + '</div>');
-			var objDiv = document.getElementById("scroll");
-			objDiv.scrollTop = objDiv.scrollHeight;
+                  			var objDiv = document.getElementById("scroll");
+                  			objDiv.scrollTop = objDiv.scrollHeight;
                     }
                 );
                 $('#inputChat').val('');

@@ -18,13 +18,16 @@ app.use('/login',loginRouter)
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', function (req, res) {
+  res.sendFile('./views/login.html',{root: __dirname});
+})
 
 app.get('/login', function (req, res) {
   res.sendFile('./views/login.html',{root: __dirname});
 })
 
-app.get('/', function (req, res) {
-  res.sendFile('./views/chat.html',{root: __dirname});
+app.get('/dashboard', function (req, res) {
+  res.sendFile('./views/dashboard.html',{root: __dirname});
 })
 
 app.use(session({
@@ -72,6 +75,33 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
   mydb = cloudant.db.use(dbUser);
   myUsers = cloudant.db.use(dbUser);
 }
+
+// app.post("/api/login", function (request, response) {
+//   var email = request.body.email;
+//   var password = request.body.password;
+//
+//   if(!myUsers) {
+//     console.log("No database.");
+//     response.send("No database.");
+//     return;
+//   }
+//   var status = false;
+//   myUsers.list({ include_docs: true }, function(err, body) {
+//     if (!err) {
+//       body.rows.forEach(function(row) {
+//         if(row.doc.email == email)
+//           if (row.doc.password == password){
+//             status = true;
+//           }
+//       });
+//       if (status == true)
+//         response.send(true);
+//       else {
+//         response.send(false);
+//       }
+//       }
+//     });
+//   });
 
 
 

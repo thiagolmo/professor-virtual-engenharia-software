@@ -21,7 +21,7 @@
       <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus>
       <label for="inputPassword" class="sr-only">Senha</label>
       <input type="password" id="inputPassword" class="form-control" placeholder="Senha" required>
-      <button class="btn btn-lg btn-primary btn-block" type="submit" id="idSubmitLogin">Entrar</button>
+      <button class="btn btn-lg btn-primary btn-block" type="button" id="idSubmitLogin">Entrar</button>
       <p class="mt-5 mb-3 text-muted"> Professor Virtual - Engenharia de Software &copy; 2018</p>
     </form>
   </body>
@@ -36,14 +36,38 @@
             email: email,
             password: password
         },
-        function (data) {
-          console.log("function" + data);
-          if (data.login == "ok"){
-            console.log(data);
-            $(location).attr('href', '/chat');
-          }else
-            console.log(data);
+        function (response) {
+          if (response == true){
+              console.log("LOG: authorized login");
+              $(location).attr('href', '/chat')
+          }else{
+              console.log("LOG: login not authorized ");
+           // document.getElementById('idAlertUserPasswordInvalid').style.display = 'inline';
+           // document.getElementById('idSpace').style.display = 'inline';
+          }
         }
     );
  });
+
+   // $("#idSubmitLogin").click(function(){
+   //    email = document.getElementById('inputEmail').value;
+   //    password = document.getElementById('inputPassword').value;
+   //    $.ajax({
+   //  				  method: "POST",
+   //  				  url: "./login/checkUser",
+   //  				  contentType: "application/json",
+   //  				  data: JSON.stringify({email: email,
+   //                                  password:password},
+   //            )
+   //  				}).done(function(response) {
+   //              if (response == true){
+   //                  console.log("LOG: authorized login");
+   //                  $(location).attr('href', '/chat')
+   //              }else{
+   //                  console.log("LOG: login not authorized ");
+   //               // document.getElementById('idAlertUserPasswordInvalid').style.display = 'inline';
+   //               // document.getElementById('idSpace').style.display = 'inline';
+   //              }
+   //          });
+  //});
  </script>
