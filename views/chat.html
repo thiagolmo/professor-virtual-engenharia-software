@@ -18,11 +18,12 @@
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
       <h5 class="my-0 mr-md-auto font-weight-normal">Professor Virtual</h5>
       <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-dark" href="#">Chat</a>
+        <a class="p-2 text-dark" href="/dashboard">Home</a>
+        <a class="p-2 text-dark" href="/chat">Chat</a>
         <a class="p-2 text-dark" href="#">Meus Dados </a>
         <a class="p-2 text-dark" href="#">Registro</a>
       </nav>
-      <a class="btn btn-outline-primary" href="#">Log off</a>
+      <a class="btn btn-outline-primary" id="idLogoff" href="#">Log off</a>
     </div>
 
     <main role="main" class="container">
@@ -44,14 +45,16 @@
                     return false;
                 }
             });
-            $("#formChat").hide();
-            $("#btnNome").click(function () {
-                $("#formNome").hide();
-                $("#formChat").show();
-                nome = $('#inputNome').val();
-                context = { nome: nome }
-                sendMessage('');
-            });
+            // Start the chat
+            $.get('/api/getUserInformation',
+                  function (response) {
+                    context = { nome: response[0].firstName }
+                    nome = response[0].firstName;
+                    sendMessage('');
+                }
+            );
+
+
             $("#btnChat").click(function () {
                 $('#logChat').append('<p> <strong class="d-block text-gray-dark">' + nome + ':</strong> ' + $('#inputChat').val());
             		var objDiv = document.getElementById("scroll");
@@ -74,15 +77,21 @@
                 $('#inputChat').val('');
             }
         });
+
+        //Destroy current session
+        $("#idLogoff").click(function(){
+          $.get('/api/destroySession',
+              function (response) {
+                if (response == true){
+                  $(location).attr('href', '/login')
+                }
+              }
+          );
+       });
     </script>
 </head>
 
 <body>
-    <form id="formNome">
-        Seu nome é:
-        <input type="text" id="inputNome" value="George">
-        <button type="button" id="btnNome">Confirmar</button>
-    </form>
     <form id="formChat">
         <p id="tituloChat">
             <p>

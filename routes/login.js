@@ -41,39 +41,38 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 
-var email;
-var password;
-var user = [];
-var status = false;
+// var email;
+// var password;
+// var status = false;
 
 
-router.post('/checkUser', (request, response) => {
-  var email = request.body.email;
-  var password = request.body.password;
-
-  if(!myUsers) {
-    console.log("No database.");
-    response.send("No database.");
-    return;
-  }
-  var status = false;
-  myUsers.list({ include_docs: true }, function(err, body) {
-    if (!err) {
-      body.rows.forEach(function(row) {
-        if(row.doc.email == email)
-          if (row.doc.password == password){
-            status = true;
-          }
-      });
-      if (status == true){
-        request.sessionprofessorvirtual = { 'email': email, 'password': password};
-        response.send(true);
-      }else {
-        response.send(false);
-      }
-      }
-    });
-  });
+// router.post('/checkUser', (request, response) => {
+//   var email = request.body.email;
+//   var password = request.body.password;
+//
+//   if(!myUsers) {
+//     console.log("No database.");
+//     response.send("No database.");
+//     return;
+//   }
+//   var status = false;
+//   myUsers.list({ include_docs: true }, function(err, body) {
+//     if (!err) {
+//       body.rows.forEach(function(row) {
+//         if(row.doc.email == email)
+//           if (row.doc.password == password){
+//             status = true;
+//           }
+//       });
+//       if (status == true){
+//         request.sessionprofessorvirtual = { 'email': email, 'password': password};
+//         response.send(true);
+//       }else {
+//         response.send(false);
+//       }
+//       }
+//     });
+//   });
 
 
   //checkEmailAndPassword(email,password);
@@ -209,35 +208,35 @@ router.post('/checkUser', (request, response) => {
 //     });
 //   });
 
-  app.get('/validSession', function(request, response) {
-  var status = false;
-  if ( request.session.user) { // Check if session exists
-    myUsers.list({ include_docs: true }, function(err, body) {
-      if (!err) {
-        body.rows.forEach(function(row) {
-          if(row.doc.userEmail == request.session.user)
-            if (row.doc.userPassword == request.session.password){
-              status = true;
-            }
-        });
-        if (status == true)
-          response.send(true);
-        else {
-          response.send(false);
-        }
-        }
-      });
-  } else {
-    response.send(false);
-  }
-});
+//   app.get('/validSession', function(request, response) {
+//   var status = false;
+//   if ( request.session.user) { // Check if session exists
+//     myUsers.list({ include_docs: true }, function(err, body) {
+//       if (!err) {
+//         body.rows.forEach(function(row) {
+//           if(row.doc.userEmail == request.session.user)
+//             if (row.doc.userPassword == request.session.password){
+//               status = true;
+//             }
+//         });
+//         if (status == true)
+//           response.send(true);
+//         else {
+//           response.send(false);
+//         }
+//         }
+//       });
+//   } else {
+//     response.send(false);
+//   }
+// });
 
-app.get('/destroySession', function(request,response) {
-  request.session.destroy(function(err) {
-    response.send(false);
-  })
-  response.send(true);
-});
+// app.get('/destroySession', function(request,response) {
+//   request.session.destroy(function(err) {
+//     response.send(false);
+//   })
+//   response.send(true);
+// });
 
 
 

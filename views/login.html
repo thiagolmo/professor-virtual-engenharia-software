@@ -31,7 +31,7 @@
   $("#idSubmitLogin").click(function(){
     email = document.getElementById('inputEmail').value;
     password = document.getElementById('inputPassword').value;
-    $.post('/login/checkUser',
+    $.post('/api/login',
         {
             email: email,
             password: password
@@ -39,7 +39,7 @@
         function (response) {
           if (response == true){
               console.log("LOG: authorized login");
-              $(location).attr('href', '/chat')
+              $(location).attr('href', '/dashboard')
           }else{
               console.log("LOG: login not authorized ");
            // document.getElementById('idAlertUserPasswordInvalid').style.display = 'inline';
