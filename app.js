@@ -166,8 +166,6 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
                    if (!err) {
                       body.rows.forEach(function(row2) {
                           if(row2.doc.email == request.sessionprofessorvirtual.email){
-                            console.log(row2.doc.email);
-                            console.log(row2.doc.email);
                             info.push(row2.doc);
                           }
                         });
@@ -184,6 +182,18 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
     } else{
       response.send("LOG: Session not found!");
     }
+});
+
+//Update user data
+app.get('/api/updateUserInformation', function(request,response) {
+  myUsers.insert(request.query, function(err, body) {
+    if (!err)
+      response.send(true);
+    else{
+      console.log(err);
+      response.send(false);
+    }
+  });
 });
 
 

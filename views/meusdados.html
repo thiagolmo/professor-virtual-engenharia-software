@@ -20,24 +20,76 @@
       <nav class="my-2 my-md-0 mr-md-3">
         <a class="p-2 text-dark" href="/dashboard">Home</a>
         <a class="p-2 text-dark" href="/chat">Chat</a>
-        <a class="p-2 text-dark" href="#">Meus Dados </a>
-        <a class="p-2 text-dark" href="#">Registro</a>
+        <a class="p-2 text-dark" href="/meusdados">Meus Dados </a>
+        <a class="p-2 text-dark" href="/registro">Registro</a>
       </nav>
       <a class="btn btn-outline-primary" id="idLogoff" href="#">Log off</a>
     </div>
 
-    <main role="main" class="container"></main>
-    <div class="card">
-      <div class="card-body">
-        This is some text within a card body.
+    <div class="mx-auto" style="width: 80%;">
+      <div class="card">
+        <div class="card-body">
+          <div id="idAlert"></div>
+
+          <form>
+            <div hidden class="form-row">
+              <div class="form-group col-md-4">
+                <label for="inputId">_id</label>
+                <input type="text" class="form-control" id="inputId">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputRev">_rev</label>
+                <input type="text" class="form-control" id="inputRev">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="inputFirstName">Firt Name</label>
+                <input type="text" class="form-control" id="inputFirstName">
+              </div>
+              <div class="form-group col-md-6">
+                <label for="inputLastName">Last Name</label>
+                <input type="text" class="form-control" id="inputLastName">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="inputEmail">E-mail</label>
+                <input type="email" class="form-control" id="inputEmail" disabled>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputPassword">Password</label>
+                <input type="password" class="form-control" id="inputPassword">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="inputAge">Age</label>
+                <input type="text" class="form-control" id="inputAge">
+              </div>
+            </div>
+            <center><button type="button" class="btn btn-primary" id="idSubmitSave">Salvar</button></center>
+          </form>
+        </div>
       </div>
-    </div>
+     </div>
     </body>
 
 
 
     <script src="/js/jquery-3.2.1.min.js"></script>
     <script>
+
+
+
+    $(document).ready(function(){
+      if(window.location.hash) {
+        if(window.location.hash = "#success"){
+            $('#idAlert').append('<div class="alert alert-success" role="alert"> Atualização de dados realizado com sucesso! </div>');
+        }else if (window.location.hash = "#error"){
+            $('#idAlert').append('<div class="alert alert-danger" role="alert"> Erro ao salvar! Tente novamente...  </div>');
+        }
+      }
+    });
+
     $.get('/api/validSession',
         function (response) {
           if (response == false){
@@ -48,10 +100,42 @@
 
     $.get('/api/getUserInformation',
           function (response) {
-            console.log (response);
-            $('#idWelcome').append('<center><h1> Welcome ' + response[0].firstName + '</h1></center>');
+            $("#inputId").val(response[0]._id);
+            $("#inputRev").val(response[0]._rev);
+            $("#inputFirstName").val(response[0].firstName);
+            $("#inputLastName").val(response[0].lastName);
+            $("#inputEmail").val(response[0].email);
+            $("#inputPassword").val(response[0].password);
+            $("#inputAge").val(response[0].age);
         }
     );
+
+
+    // var test = $.get('/api/getUserInformation', function (response) { return response } );
+    // var test2 = test.responseText;
+    // console.log(test2);
+    $("#idSubmitSave").click(function(){
+      $.get('/api/updateUserInformation',
+        {
+          "_id": $("#inputId").val(),
+          "_rev": $("#inputRev").val(),
+          "email": $("#inputEmail").val(),
+          "password": $("#inputPassword").val(),
+          "firstName": $("#inputFirstName").val(),
+          "lastName": $("#inputLastName").val(),
+          "age": $("#inputAge").val()
+        },
+            function (response) {
+              if (response == true){
+                location.reload();
+                window.location = window.location + "#success";
+              } else{
+                location.reload();
+                window.location = window.location + "#error";
+              }
+          }
+      );
+    });
 
     //Destroy current session
     $("#idLogoff").click(function(){
