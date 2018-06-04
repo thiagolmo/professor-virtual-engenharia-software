@@ -25,15 +25,94 @@
       </nav>
       <a class="btn btn-outline-primary" id="idLogoff" href="#">Log off</a>
     </div>
-
-    <main role="main" class="container"></main>
     <div id="idWelcome"></div>
+  </br>
+
+    <div class="mx-auto" style="width: 80%;">
+      <div class="card">
+        <div class="card-body">
+        <div id="idAlert"></div>
+          <form>
+            <div hidden class="form-row">
+              <div class="form-group col-md-4">
+                <label for="inputId">_id</label>
+                <input type="text" class="form-control" id="inputId">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputRev">_rev</label>
+                <input type="text" class="form-control" id="inputRev">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputUserEmail">E-mail</label>
+                <input type="email" class="form-control" id="inputUserEmail" disabled>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="inputVirtualProfessorName">Nome professor/professora virtual:</label>
+                <input type="text" class="form-control" id="inputVirtualProfessorName">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputUserNickName">Como deseja ser chamado:</label>
+                <input type="text" class="form-control" id="inputUserNickName">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputVirtualProfessorGender">Sexo professor/professora virtual:</label>
+                  <select class="custom-select my-1 mr-sm-2" id="inputVirtualProfessorGender">
+                    <option selected value="male">Masculino</option>
+                    <option value="female">Feminino</option>
+                  </select>
+              </div>
+            </div>
+            <div>
+              <label for="inputUserDifficultyLevel">Nível de dificuldade com Engenharia de Software: </label>
+              <input type="range" class="custom-range" min="0" max="2" id="inputUserDifficultyLevel">
+              <div class="form-row">
+                <div class="form-group col-md-4">
+                  <p class="text-left"><small>Baixo</small></p>
+                </div>
+                <div class="form-group col-md-4">
+                  <p class="text-center"><small>Médio</small></p>
+                </div>
+                <div class="form-group col-md-4">
+                  <p class="text-right"><small>Alto</small></p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label for="inputUserResponseType">Você prefere respostas:  </label>
+              <input type="range" class="custom-range" min="0" max="1" id="inputUserResponseType">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <p class="text-left"><small>Curta</small></p>
+                </div>
+                <div class="form-group col-md-6">
+                  <p class="text-right"><small>Longa</small></p>
+                </div>
+              </div>
+            </div>
+              <center><button type="button" class="btn btn-primary" id="idSubmitSave">Salvar</button></center>
+          </form>
+        </div>
+      </div>
+    </div>
     </body>
 
 
 
     <script src="/js/jquery-3.2.1.min.js"></script>
     <script>
+
+    $(document).ready(function(){
+      if(window.location.hash) {
+        if(window.location.hash = "#success"){
+            $('#idAlert').append('<div class="alert alert-success" role="alert"> Atualização de dados realizado com sucesso! </div>');
+        }else if (window.location.hash = "#error"){
+            $('#idAlert').append('<div class="alert alert-danger" role="alert"> Erro ao salvar! Tente novamente...  </div>');
+        }
+      }
+    });
+
     $.get('/api/validSession',
         function (response) {
           if (response == false){
@@ -44,9 +123,46 @@
 
     $.get('/api/getUserInformation',
           function (response) {
-            $('#idWelcome').append('<center><h1> Welcome ' + response[0].firstName + '</h1></center>');
+            $('#idWelcome').append('<center><h1> Seja bem vindo(a) ' + response[0].firstName + ' ' +  response[0].lastName + '</h1></center>');
         }
     );
+
+    $.get('/api/getVirtualProfessorInformation',
+          function (response) {
+            $("#inputId").val(response[0]._id);
+            $("#inputRev").val(response[0]._rev);
+            $("#inputUserEmail").val(response[0].userEmail);
+            $("#inputVirtualProfessorName").val(response[0].virtualProfessorName);
+            $("#inputUserNickName").val(response[0].userNickName);
+            $("#inputVirtualProfessorGender").val(response[0].virtualProfessorGender);
+            $("#inputUserDifficultyLevel").val(response[0].userDifficultyLevel);
+            $("#inputUserResponseType").val(response[0].userResponseType);
+        }
+    );
+
+    $("#idSubmitSave").click(function(){
+      $.get('/api/updateVirtualProfessorInformation',
+        {
+          "_id": $("#inputId").val(),
+          "_rev": $("#inputRev").val(),
+          "userEmail": $("#inputUserEmail").val(),
+          "virtualProfessorName": $("#inputVirtualProfessorName").val(),
+          "userNickName": $("#inputUserNickName").val(),
+          "virtualProfessorGender": $("#inputVirtualProfessorGender").val(),
+          "userDifficultyLevel": $("#inputUserDifficultyLevel").val(),
+          "userResponseType": $("#inputUserResponseType").val()
+        },
+            function (response) {
+              if (response == true){
+                location.reload();
+                window.location = window.location + "#success";
+              } else{
+                location.reload();
+                window.location = window.location + "#error";
+              }
+          }
+      );
+    });
 
     //Destroy current session
     $("#idLogoff").click(function(){

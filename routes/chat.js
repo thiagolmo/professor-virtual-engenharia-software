@@ -24,11 +24,26 @@ router.post('/mensagem', (req, res) => {
             res.send(err);
         }
         else {
-            res.send({ 'resposta': response.output.text[0] ,'context': response.context});
-            console.log(response)
+            res.send(response);
+            //insertConversationRecord(response.input.text[0],response.intents[0]);
+            //console.log(response)
 
         }
     });
 
 });
+
+// function insertConversationRecord(input, confidence){
+//   router.post('/api/insertConversationRecord', (req, res) => {
+//       "{
+//           input: input,
+//           confidence: confidence
+//       }"
+//     },
+//       function (response) {
+//
+//       }
+//   );
+// }
+
 module.exports = router;

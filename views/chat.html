@@ -45,18 +45,34 @@
                     return false;
                 }
             });
+
+            $.get('/api/validSession',
+                function (response) {
+                  if (response == false){
+                    $(location).attr('href', '/login')
+                  }
+                }
+            );
+
             // Start the chat
-            $.get('/api/getUserInformation',
+            $.get('/api/getVirtualProfessorInformation',
                   function (response) {
-                    context = { nome: response[0].firstName }
-                    nome = response[0].firstName;
+                    context = {
+                      userNickName: response[0].userNickName,
+                      virtualProfessorName: response[0].virtualProfessorName,
+                      virtualProfessorGender: response[0].virtualProfessorGender,
+                      userDifficultyLevel: response[0].userDifficultyLevel,
+                      userResponseType: response[0].userResponseType
+                    }
+                    userNickName = response[0].userNickName;
+                    //email = response[0].email;
                     sendMessage('');
                 }
             );
 
 
             $("#btnChat").click(function () {
-                $('#logChat').append('<p> <strong class="d-block text-gray-dark">' + nome + ':</strong> ' + $('#inputChat').val());
+                $('#logChat').append('<p> <strong class="d-block text-gray-dark">' + userNickName + ':</strong> ' + $('#inputChat').val());
             		var objDiv = document.getElementById("scroll");
             		objDiv.scrollTop = objDiv.scrollHeight;
                 sendMessage($('#inputChat').val());
@@ -69,14 +85,38 @@
                     },
                     function (data) {
                         context = data.context;
-                        $('#logChat').append('<div class="media text-muted pt-3"><img src="https://marketplace.canva.com/MACHG5SxDWs/1/thumbnail_large/canva-man-with-glasses-icon-MACHG5SxDWs.png" height="40px" width="40px"><p> <strong class="d-block text-gray-dark">Professor Alex: </strong>' + data.resposta + '</div>');
-                  			var objDiv = document.getElementById("scroll");
+                          if (data.context.virtualProfessorGender == "male")
+                            $('#logChat').append('<div class="media text-muted pt-3"><img src="https://marketplace.canva.com/MACHG5SxDWs/1/thumbnail_large/canva-man-with-glasses-icon-MACHG5SxDWs.png" height="40px" width="40px"><p> <strong class="d-block text-gray-dark">Professor ' + data.context.virtualProfessorName + ': </strong>' + data.output.text[0] + '</div>');
+                          else
+                            $('#logChat').append('<div class="media text-muted pt-3"><img src="https://www.dist113.org/cms/lib/IL01904711/Centricity/Domain/340/bitmoji.png" height="35px" width="35px"><p> <strong class="d-block text-gray-dark">Professora ' + data.context.virtualProfessorName + ': </strong>' + data.output.text[0] + '</div>');
+
+                        var objDiv = document.getElementById("scroll");
                   			objDiv.scrollTop = objDiv.scrollHeight;
+
+                        if (data.intents[0]!= null && data.input.text != ""){
+                          if (Number(data.intents[0].confidence) < 0.8){
+                            insertConversationRecord(data.input.text,data.intents[0].confidence);
+                          }
+                        }else if (data.input.text != "")
+                          insertConversationRecord(data.input.text,null);
+
                     }
                 );
                 $('#inputChat').val('');
             }
         });
+
+        function insertConversationRecord(input, confidence){
+          $.post('/api/insertConversationRecord',
+              {
+                  userQuestion: input,
+                  virtualProfessorConfidence: confidence
+              },
+              function (response) {
+
+              }
+          );
+        }
 
         //Destroy current session
         $("#idLogoff").click(function(){

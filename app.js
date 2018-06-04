@@ -5,6 +5,7 @@ const chatRouter = require('./routes/chat')
 const loginRouter = require('./routes/login')
 const dashboardRouter = require('./routes/dashboard')
 const meusDadosRouter = require('./routes/meusdados')
+const registroRouter = require('./routes/registro')
 const bodyParser = require('body-parser')
 var session = require('client-sessions');
 var cfenv = require("cfenv");
@@ -19,6 +20,7 @@ app.use('/chat',chatRouter)
 app.use('/login',loginRouter)
 app.use('/dashboard',dashboardRouter)
 app.use('/meusdados',meusDadosRouter)
+app.use('/registro',registroRouter)
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -36,6 +38,10 @@ app.get('/dashboard', function (req, res) {
 
 app.get('/meusdados', function (req, res) {
   res.sendFile('./views/meusdados.html',{root: __dirname});
+})
+
+app.get('/registro', function (req, res) {
+  res.sendFile('./views/registro.html',{root: __dirname});
 })
 
 app.use(session({
@@ -71,17 +77,32 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
   }
 
   //database name
+  var dbVirtualProfessor = 'professor-virtual-engenharia-software-virtual-professor';
   var dbUser = 'professor-virtual-engenharia-software-users';
+  var dbConversationRecord =  'professor-virtual-engenharia-software-conversation-record';
 
   //Create the database.
+  cloudant.db.create(dbVirtualProfessor, function(err, data) {
+    if(!err) //err if database doesn't already exists
+      console.log("Created database: " + dbVirtualProfessor);
+  });
+
   cloudant.db.create(dbUser, function(err, data) {
     if(!err) //err if database doesn't already exists
       console.log("Created database: " + dbUser);
   });
 
+  cloudant.db.create(dbConversationRecord, function(err, data) {
+    if(!err) //err if database doesn't already exists
+      console.log("Created database: " + dbConversationRecord);
+  });
+
+
+
   // Specify the database we are going to use (mydb)...
-  mydb = cloudant.db.use(dbUser);
+  myVirtualProfessor = cloudant.db.use(dbVirtualProfessor);
   myUsers = cloudant.db.use(dbUser);
+  myConversationRecord = cloudant.db.use(dbConversationRecord);
 }
 // Check if user and email exist on database
  app.post("/api/login", function (request, response) {
@@ -184,6 +205,74 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
     }
 });
 
+//Get virtual professor data
+app.get('/api/getVirtualProfessorInformation', function(request,response) {
+  var info = [];
+
+  if (request.sessionprofessorvirtual.email) { // Check if session exists
+    myUsers.list({ include_docs: true }, function(err, body) {
+      if (!err) {
+        body.rows.forEach(function(row) {
+          //First check it the user have access
+          if(row.doc.email == request.sessionprofessorvirtual.email){
+            if (row.doc.password == request.sessionprofessorvirtual.password){
+              //Now it can get the user data
+              myVirtualProfessor.list({ include_docs: true }, function(err, body) {
+                 if (!err) {
+                    body.rows.forEach(function(row2) {
+                        if(row2.doc.userEmail == request.sessionprofessorvirtual.email){
+                          info.push(row2.doc);
+                        }
+                      });
+                      response.json(info);
+                  }
+              });
+            }else{
+              response.send("LOG: User invalid!");
+            }
+          }
+        });
+      }
+    });
+  } else{
+    response.send("LOG: Session not found!");
+  }
+});
+
+//Get conversation record data
+app.get('/api/getConversationRecord', function(request,response) {
+  var info = [];
+
+  if (request.sessionprofessorvirtual.email) { // Check if session exists
+    myUsers.list({ include_docs: true }, function(err, body) {
+      if (!err) {
+        body.rows.forEach(function(row) {
+          //First check it the user have access
+          if(row.doc.email == request.sessionprofessorvirtual.email){
+            if (row.doc.password == request.sessionprofessorvirtual.password){
+              //Now it can get conversation record data
+              myConversationRecord.list({ include_docs: true }, function(err, body) {
+                 if (!err) {
+                    body.rows.forEach(function(row2) {
+                        if(row2.doc.userEmail == request.sessionprofessorvirtual.email){
+                          info.push(row2.doc);
+                        }
+                      });
+                      response.json(info);
+                  }
+              });
+            }else{
+              response.send("LOG: User invalid!");
+            }
+          }
+        });
+      }
+    });
+  } else{
+    response.send("LOG: Session not found!");
+  }
+});
+
 //Update user data
 app.get('/api/updateUserInformation', function(request,response) {
   myUsers.insert(request.query, function(err, body) {
@@ -195,6 +284,91 @@ app.get('/api/updateUserInformation', function(request,response) {
     }
   });
 });
+
+//Update virtual professor data
+app.get('/api/updateVirtualProfessorInformation', function(request,response) {
+  myVirtualProfessor.insert(request.query, function(err, body) {
+    if (!err)
+      response.send(true);
+    else{
+      console.log(err);
+      response.send(false);
+    }
+  });
+});
+
+//Insert conversation record
+app.post('/api/insertConversationRecord', function(request,response) {
+  console.log(request.body);
+  var alreadyExist = false;
+  var attempts = 0;
+  var _id = null;
+  var _rev = null;
+  myConversationRecord.list({ include_docs: true }, function(err, body) {
+     if (!err) {
+        body.rows.forEach(function(row) {
+            if(row.doc.userEmail == request.sessionprofessorvirtual.email){
+                if(row.doc.userQuestion == request.body.userQuestion){
+                  alreadyExist = true;
+                  attempts = Number(row.doc.attempts);
+                  _id = row.doc._id;
+                  _rev = row.doc._rev;
+                }
+            }
+        });
+        console.log(alreadyExist);
+        if (alreadyExist == false){
+          var query = {
+            "userEmail": request.sessionprofessorvirtual.email,
+            "userQuestion": request.body.userQuestion,
+            "virtualProfessorConfidence": Number(request.body.virtualProfessorConfidence),
+            "attempts": 1
+          }
+          myConversationRecord.insert(query, function(err, body) {
+            if (!err)
+              response.send(true);
+            else{
+              console.log(err);
+              response.send(false);
+            }
+          });
+        } else {
+          var query = {
+            "_id": _id,
+            "_rev": _rev,
+            "userEmail": request.sessionprofessorvirtual.email,
+            "userQuestion": request.body.userQuestion,
+            "virtualProfessorConfidence": Number (request.body.virtualProfessorConfidence),
+            "attempts": (attempts+1)
+          }
+          console.log(query);
+          myConversationRecord.insert(query, function(err, body) {
+            if (!err)
+              response.send(true);
+            else{
+              console.log(err);
+              response.send(false);
+            }
+          });
+        }
+
+      }
+
+    });
+  });
+
+
+
+
+  // myConversationRecord.insert(request.body, function(err, body) {
+  //   if (!err)
+  //     response.send(true);
+  //   else{
+  //     console.log(err);
+  //     response.send(false);
+  //   }
+  // });
+// });
 
 
 
