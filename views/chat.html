@@ -61,8 +61,8 @@
                       userNickName: response[0].userNickName,
                       virtualProfessorName: response[0].virtualProfessorName,
                       virtualProfessorGender: response[0].virtualProfessorGender,
-                      userDifficultyLevel: response[0].userDifficultyLevel,
-                      userResponseType: response[0].userResponseType
+                      userDifficultyLevel: Number(response[0].userDifficultyLevel),
+                      userResponseType: Number(response[0].userResponseType)
                     }
                     userNickName = response[0].userNickName;
                     //email = response[0].email;
