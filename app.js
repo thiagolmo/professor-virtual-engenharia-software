@@ -55,25 +55,24 @@ app.use(session({
 var vcapLocal;
 
 try {
-  vcapLocal = require('./vcap-local.json');
+  vcapLocal = require('./vcap.json');
   console.log("Loaded local VCAP", vcapLocal);
 } catch (e) { }
 
-const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
+//const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
 
-const appEnv = cfenv.getAppEnv(appEnvOpts);
+//const appEnv = cfenv.getAppEnv(appEnvOpts);
 
-if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
+
+if (vcapLocal.cloudantNoSQLDB[0]) {
   // Load the Cloudant library.
   var Cloudant = require('cloudant');
 
   // Initialize database with credentials
-  if (appEnv.services['cloudantNoSQLDB']) {
-     // CF service named 'cloudantNoSQLDB'
-     var cloudant = Cloudant(appEnv.services['cloudantNoSQLDB'][0].credentials);
+  if (vcapLocal.cloudantNoSQLDB[0]) {
+     var cloudant = Cloudant(vcapLocal.cloudantNoSQLDB[0].credentials);
   } else {
-     // user-provided service with 'cloudant' in its name
-     var cloudant = Cloudant(appEnv.getService(/cloudant/).credentials);
+     console.log("Cloudant database not found");
   }
 
   //database name

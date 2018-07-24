@@ -7,5 +7,18 @@
                 "password": "M7aa6QeRpV7Q"
             }
         }
+    ],
+    "cloudantNoSQLDB": [
+      {
+        "credentials": {
+          "username": "24b47d1f-5d14-43fa-a5a6-b0b94fccc786-bluemix",
+          "password": "3b28a44b33b0543cff006c5986d0f75917eea10e103e963039924c5a98b07324",
+          "host": "24b47d1f-5d14-43fa-a5a6-b0b94fccc786-bluemix.cloudant.com",
+          "port": 443,
+          "url": "https://24b47d1f-5d14-43fa-a5a6-b0b94fccc786-bluemix:3b28a44b33b0543cff006c5986d0f75917eea10e103e963039924c5a98b07324@24b47d1f-5d14-43fa-a5a6-b0b94fccc786-bluemix.cloudant.com",
+          "plugins": "promises"
+        },
+        "label": "cloudantNoSQLDB"
+      }
     ]
 }
