@@ -44,6 +44,10 @@ app.get('/registro', function (req, res) {
   res.sendFile('./views/registro.html',{root: __dirname});
 })
 
+app.get('/novoaluno', function (req, res) {
+  res.sendFile('./views/novoaluno.html',{root: __dirname});
+})
+
 app.use(session({
   cookieName: 'sessionprofessorvirtual',
   secret: 'random_string_goes_here',
@@ -103,7 +107,7 @@ if (vcapLocal.cloudantNoSQLDB[0]) {
   myUsers = cloudant.db.use(dbUser);
   myConversationRecord = cloudant.db.use(dbConversationRecord);
 }
-// Check if user and email exist on database
+// Check if email and password  exist on database
  app.post("/api/login", function (request, response) {
   var email = request.body.email;
   var password = request.body.password;
@@ -132,6 +136,65 @@ if (vcapLocal.cloudantNoSQLDB[0]) {
       }
     });
   });
+
+  // Check if email already exists on database
+   app.post("/api/createNewUser", function (request, response) {
+
+     if(!myUsers) {
+       console.log("No database.");
+       response.send("No database.");
+       return;
+     }
+    var email = request.body.email;
+    var status = false;
+    myUsers.list({ include_docs: true }, function(err, body) {
+      if (!err) {
+        body.rows.forEach(function(row) {
+          if(row.doc.email == email)
+              status = true;
+        });
+        if (status == false){
+          myUsers.insert(request.body, function(err, body) {
+            if (!err){
+              var queryVirtualProfessor =
+              {
+                "userEmail": request.body.email,
+                "virtualProfessorName": "Fernando",
+                "userNickName": request.body.firstName,
+                "virtualProfessorGender": "male",
+                "userDifficultyLevel": "0",
+                "userResponseType": "0"
+              };
+              myVirtualProfessor.insert(queryVirtualProfessor, function(err, body) {
+                if (!err)
+                  response.send(true);
+                else{
+                  console.log(err);
+                  response.send(err);
+                }
+              });
+            }else{
+              console.log(err);
+              response.send(err);
+            }
+          });
+        }else {
+          response.send(false);
+        }
+      }
+    });
+
+    // myUsers.insert(request.query, function(err, body) {
+    //   if (!err)
+    //     response.send(true);
+    //   else{
+    //     console.log(err);
+    //     response.send(false);
+    //   }
+    // });
+  });
+
+
 
   //Check if email and password of session exist on database
   app.get('/api/validSession', function (request, response) {
@@ -298,7 +361,6 @@ app.get('/api/updateVirtualProfessorInformation', function(request,response) {
 
 //Insert conversation record
 app.post('/api/insertConversationRecord', function(request,response) {
-  console.log(request.body);
   var alreadyExist = false;
   var attempts = 0;
   var _id = null;
@@ -315,7 +377,6 @@ app.post('/api/insertConversationRecord', function(request,response) {
                 }
             }
         });
-        console.log(alreadyExist);
         if (alreadyExist == false){
           var query = {
             "userEmail": request.sessionprofessorvirtual.email,
@@ -340,7 +401,6 @@ app.post('/api/insertConversationRecord', function(request,response) {
             "virtualProfessorConfidence": Number (request.body.virtualProfessorConfidence),
             "attempts": (attempts+1)
           }
-          console.log(query);
           myConversationRecord.insert(query, function(err, body) {
             if (!err)
               response.send(true);
@@ -355,21 +415,6 @@ app.post('/api/insertConversationRecord', function(request,response) {
 
     });
   });
-
-
-
-
-  // myConversationRecord.insert(request.body, function(err, body) {
-  //   if (!err)
-  //     response.send(true);
-  //   else{
-  //     console.log(err);
-  //     response.send(false);
-  //   }
-  // });
-// });
-
-
 
 
 app.listen(serverPort, function () {

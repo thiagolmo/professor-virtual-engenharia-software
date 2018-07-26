@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Professor Virtual - Engenharia de Software</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/login.css" rel="stylesheet">
+
+  </head>
+
+  <body class="text-center">
+    <div class="mx-auto" style="width: 80%;">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="h3 mb-3 font-weight-normal">Cadastro de Aluno</h1>
+          <div class="alert alert-success"  style="display:none;" id="alertSuccess">Aluno cadastrado com sucesso! </div>
+          <div class="alert alert-danger"  style="display:none;" id="alertError">Aluno já possui e-mail cadastrado! Tente novamente... </div>
+          <div class="alert alert-danger"  style="display:none;" id="alertErrorDB">Erro ao salvar na base de dados! Contate o administrador do sistema! </div>
+          <div class="alert alert-warning"  style="display:none;" id="alertWarning">Não foram preenchidos todos os campos, verifique e tente novamete! </div>
+          <form>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="inputFirstName">Primero nome </label>
+                <input type="text" class="form-control" id="inputFirstName" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputLastName">Sobrenome</label>
+                <input type="text" class="form-control" id="inputLastName" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputLastName">Sexo</label>
+                  <select class="custom-select my-1 mr-sm-2" id="inputGender" required>
+                    <option value="male">Masculino</option>
+                    <option value="female">Feminino</option>
+                  </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="inputEmail">E-mail</label>
+                <input type="email" class="form-control" id="inputEmail" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="inputPassword">Password</label>
+                <input type="password" class="form-control" id="inputPassword" required>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="inputAge">Age</label>
+                <input type="number" class="form-control" id="inputAge" required>
+              </div>
+            </div>
+            <center>
+              <button type="button" class="btn btn-primary" id="idSubmitUser">Criar Usuário</button>
+              <button type="button" class="btn btn-secondary" id="idComeBack">Voltar</button>
+            </center>
+          </form>
+        </div>
+      </div>
+     </div>
+    </body>
+    <script src="/js/jquery-3.2.1.min.js"></script>
+
+    <script>
+
+      $("#idSubmitUser").click(function(){
+        if ($("#inputEmail").val() == "" || $("#inputPassword").val() == "" || $("#inputFirstName").val() == "" || $("#inputLastName").val() == "" || $("#inputGender").val() == "" || $("#inputAge").val() == ""){
+          $("#alertSuccess").hide();
+          $("#alertError").hide();
+          $("#alertErrorDB").hide();
+          $("#alertWarning").hide().show('medium');
+        }else {
+          $.post('/api/createNewUser',
+            {
+              "email": $("#inputEmail").val(),
+              "password": $("#inputPassword").val(),
+              "firstName": $("#inputFirstName").val(),
+              "lastName": $("#inputLastName").val(),
+              "gender": $("#inputGender").val(),
+              "age": $("#inputAge").val()
+            },
+                function (response) {
+                  if (response == true){
+                    $("#alertError").hide();
+                    $("#alertWarning").hide();
+                    $("#alertErrorDB").hide();
+                    $("#alertSuccess").hide().show('medium');
+                  }else if (response == false){
+                    $("#alertSuccess").hide();
+                    $("#alertWarning").hide();
+                    $("#alertErrorDB").hide();
+                    $("#alertError").hide().show('medium');
+                  }else{
+                  $("#alertError").hide();
+                  $("#alertWarning").hide();
+                  $("#alertSuccess").hide();
+                  $("#alertErrorDB").hide().show('medium');
+                }
+              }
+          );
+        }
+      });
+
+      $("#idComeBack").click(function(){
+        $(location).attr('href', '/login')
+      });
+
+    </script>
+</html>
