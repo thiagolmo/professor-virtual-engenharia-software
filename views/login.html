@@ -22,6 +22,13 @@
       <label for="inputPassword" class="sr-only">Senha</label>
       <input type="password" id="inputPassword" class="form-control" placeholder="Senha" required>
       <button class="btn btn-lg btn-primary btn-block" type="button" id="idSubmitLogin">Entrar</button>
+      <br>
+      <div class="alert alert-success"  style="display:none;" id="alertSuccess">Entrando... </div>
+      <div class="alert alert-danger"  style="display:none;" id="alertError">Usuário ou senha inválido! </div>
+      <p>Aluno novo? <a href="#">criar uma conta</a></p>
+
+
+
       <p class="mt-5 mb-3 text-muted"> Professor Virtual - Engenharia de Software &copy; 2018</p>
     </form>
   </body>
@@ -39,9 +46,14 @@
         function (response) {
           if (response == true){
               console.log("LOG: authorized login");
+              $("#alertSuccess").hide().show('medium');
               $(location).attr('href', '/dashboard')
           }else{
               console.log("LOG: login not authorized ");
+              $("#alertError").hide().show('medium');
+
+              //$('#alert').append('<div class="alert alert-danger" role="alert">Usuário ou senha inválido! </div>');
+
            // document.getElementById('idAlertUserPasswordInvalid').style.display = 'inline';
            // document.getElementById('idSpace').style.display = 'inline';
           }
